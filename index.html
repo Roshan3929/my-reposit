@@ -1,119 +1,454 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Digital Logic Simulator</title>
+    <title>Digital Logic Simulator</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-  </head>
-  <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap'); /* For dramatic headings */
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(45deg, black, violet, orange, white);
+            background-size: 600% 600%;
+            animation: gradientAnimation 20s ease infinite;
+            color: #333;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content h1, .content h2, .content h3 {
+            margin-bottom: 20px;
+            color: #6a0dad; /* Lilac color */
+            font-family: 'Lobster', cursive; /* Dramatic font */
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        .content p {
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        .content h1:hover, .content h2:hover, .content h3:hover, .content p:hover {
+            color: #ffffff; /* White color on hover */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ff6700;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        th {
+            background-color: #6a0dad; /* Lilac color */
+            color: white;
+        }
+
+        tr:hover td {
+            background-color: #ffecb3; /* Light orange background on hover */
+        }
+
+        .gate-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .gate-container img {
+            max-width: 150px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1.5s ease forwards;
+            opacity: 0;
+        }
+
+        .gate-container:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: left; /* Align text to the left */
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-container h2 {
+            color: #ff6700;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .game-container p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        #unity-container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+            background-color: #f4f4f4;
+            border: 2px solid #6a0dad;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* Center the simulator */
+            display: block;
+        }
+
+        #unity-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #6a0dad;
+        }
+
+        .footer-text {
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Styles for the embedded Circuit Puzzle Game */
+        .circuit-game {
+            margin: 50px auto;
+            width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .circuit-game h1 {
+            font-size: 24px;
+            color: #ff6700;
+        }
+
+        .circuit-game .gate {
+            margin: 20px;
+            padding: 10px;
+            display: inline-block;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .circuit-game .gate.active {
+            background-color: #76b852;
+            color: white;
+        }
+
+        .circuit-game .output {
+            margin-top: 30px;
+            font-size: 24px;
+        }
+
+        .circuit-game .lightbulb {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: 2px solid #ccc;
+            margin: 0 auto;
+        }
+
+        .circuit-game .lightbulb.on {
+            background-color: yellow;
+        }
+
+        .circuit-game .switch-button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #ddd;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .circuit-game .switch-button.on {
+            background-color: #76b852;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1>Understanding Truth Tables and Basic Connectives</h1>
+            <p>Welcome to our educational simulation of logic gates! In digital logic design, understanding truth tables and basic connectives is essential. This page provides a brief overview of truth tables and the basic logic gates used in digital circuits.</p>
+
+            <h2>Truth Tables</h2>
+            <p>A truth table is a mathematical table used to determine the validity of logical expressions. It shows all possible values of inputs and the corresponding outputs for a given logical operation.</p>
+
+            <h3>Example Truth Table for AND Gate</h3>
+            <table>
+                <tr>
+                    <th>Input A</th>
+                    <th>Input B</th>
+                    <th>Output (A AND B)</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+            </table>
+            
+            <h3>Truth Table for OR Gate</h3>
+            <table>
+                <tr>
+                    <th>Input A</th>
+                    <th>Input B</th>
+                    <th>Output (A OR B)</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+            </table>
+
+            <h3>Truth Table for NOT Gate</h3>
+            <table>
+                <tr>
+                    <th>Input</th>
+                    <th>Output (NOT A)</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+            </table>
+            <h2>Basic Connective Gates</h2>
+            <p>Logic gates are the building blocks of digital circuits. They perform basic logical functions that are fundamental to digital circuits. Here are some common logic gates:</p>
+            
+            <div class="gate-container">
+                <div>
+                    <h3>1. AND Gate</h3>
+                    <p>The AND gate outputs true (1) only if both inputs are true (1). It performs a logical conjunction.</p>
+                </div>
+                <img src="images/and-gate.png" alt="AND Gate">
+            </div>
+            
+            <div class="gate-container">
+                <img src="images/or-gate.png" alt="OR Gate">
+                <div>
+                    <h3>2. OR Gate</h3>
+                    <p>The OR gate outputs true (1) if at least one of the inputs is true (1). It performs a logical disjunction.</p>
+                </div>
+            </div>
+            
+            <div class="gate-container">
+                <div>
+                    <h3>3. NOT Gate</h3>
+                    <p>The NOT gate outputs the inverse of the input. It performs a logical negation.</p>
+                </div>
+                <img src="images/not-gate.png" alt="NOT Gate">
+            </div>
+            
+            <div class="gate-container">
+                <img src="images/nand-gate.png" alt="NAND Gate">
+                <div>
+                    <h3>4. NAND Gate</h3>
+                    <p>The NAND gate outputs false (0) only if both inputs are true (1). It is the negation of the AND gate.</p>
+                </div>
+            </div>
+            
+            <div class="gate-container">
+                <div>
+                    <h3>5. NOR Gate</h3>
+                    <p>The NOR gate outputs true (1) if both inputs are false (0). It is the negation of the OR gate.</p>
+                </div>
+                <img src="images/nor-gate.png" alt="NOR Gate">
+            </div>
+            
+            <div class="gate-container">
+                <img src="images/xor-gate.png" alt="XOR Gate">
+                <div>
+                    <h3>6. XOR Gate</h3>
+                    <p>The XOR gate outputs true (1) if exactly one of the inputs is true (1). It performs an exclusive OR operation.</p>
+                </div>
+            </div>
+            
+            <div class="gate-container">
+                <div>
+                    <h3>7. XNOR Gate</h3>
+                    <p>The XNOR gate outputs true (1) if both inputs are the same. It is the negation of the XOR gate.</p>
+                </div>
+                <img src="images/xnor-gate.png" alt="XNOR Gate">
+            </div>
         </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-webgl-logo"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Digital Logic Simulator</div>
-      </div>
+        
+        <div class="game-container">
+            <h2>Try the Digital Logic Simulator</h2>
+            <p>Our Digital Logic Simulator allows you to interactively explore logic gates and their behavior. Use this tool to experiment with different logic gates (AND, OR, NOT, etc.) and see how they affect the output based on various input combinations.</p>
+            <p>This simulator provides a practical way to understand truth tables and how logical operations are performed in digital circuits. Experiment with different gate configurations and inputs to see real-time results and deepen your understanding of digital logic concepts.</p>
+            <div id="unity-container">
+                <canvas id="unity-canvas" width="960" height="600"></canvas>
+                <div id="unity-loading-bar">
+                    <div id="unity-logo"></div>
+                    <div id="unity-progress-bar-empty">
+                        <div id="unity-progress-bar-full"></div>
+                    </div>
+                </div>
+                <div id="unity-warning"></div>
+                <div id="unity-footer">
+                    <div id="unity-webgl-logo"></div>
+                    <div id="unity-fullscreen-button"></div>
+                    <div id="unity-build-title">Digital Logic Simulator</div>
+                </div>
+            </div>
+        </div>
     </div>
+    
     <script>
-      var container = document.querySelector("#unity-container");
-      var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var warningBanner = document.querySelector("#unity-warning");
+        var container = document.querySelector("#unity-container");
+        var canvas = document.querySelector("#unity-canvas");
+        var loadingBar = document.querySelector("#unity-loading-bar");
+        var progressBarFull = document.querySelector("#unity-progress-bar-full");
+        var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+        var warningBanner = document.querySelector("#unity-warning");
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
-      function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
+        function unityShowBanner(msg, type) {
+            function updateBannerVisibility() {
+                warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+            }
+            var div = document.createElement('div');
+            div.innerHTML = msg;
+            warningBanner.appendChild(div);
+            if (type == 'error') div.style = 'background: red; padding: 10px;';
+            else {
+                if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+                setTimeout(function() {
+                    warningBanner.removeChild(div);
+                    updateBannerVisibility();
+                }, 5000);
+            }
             updateBannerVisibility();
-          }, 5000);
         }
-        updateBannerVisibility();
-      }
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/WebGLBuild.loader.js";
-      var config = {
-        dataUrl: buildUrl + "/WebGLBuild.data.br",
-        frameworkUrl: buildUrl + "/WebGLBuild.framework.js.br",
-        codeUrl: buildUrl + "/WebGLBuild.wasm.br",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "2RAS",
-        productName: "Digital Logic Simulator",
-        productVersion: "1.0.2",
-        showBanner: unityShowBanner,
-      };
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/WebGLBuild.loader.js";
+        var config = {
+            dataUrl: buildUrl + "/WebGLBuild.data.br",
+            frameworkUrl: buildUrl + "/WebGLBuild.framework.js.br",
+            codeUrl: buildUrl + "/WebGLBuild.wasm.br",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "2RAS",
+            productName: "Digital Logic Simulator",
+            productVersion: "1.0.2",
+            showBanner: unityShowBanner,
+        };
 
-      // By default Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            var meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+            document.getElementsByTagName('head')[0].appendChild(meta);
+            container.className = "unity-mobile";
+            canvas.className = "unity-mobile";
+            unityShowBanner('WebGL builds are not supported on mobile devices.');
+        } else {
+            canvas.style.width = "960px";
+            canvas.style.height = "600px";
+        }
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
+        loadingBar.style.display = "block";
 
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        container.className = "unity-mobile";
-        canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-        unityShowBanner('WebGL builds are not supported on mobile devices.');
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
-      }
-
-      loadingBar.style.display = "block";
-
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
-        }).catch((message) => {
-          alert(message);
-        });
-      };
-      document.body.appendChild(script);
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                progressBarFull.style.width = 100 * progress + "%";
+            }).then((unityInstance) => {
+                loadingBar.style.display = "none";
+                fullscreenButton.onclick = () => {
+                    unityInstance.SetFullscreen(1);
+                };
+            }).catch((message) => {
+                alert(message);
+            });
+        };
+        document.body.appendChild(script);
     </script>
-  </body>
+</body>
 </html>
