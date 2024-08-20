@@ -1,2 +1,2 @@
 # my-reposit
-# Basic Connectives Simulator 
+# Basic Connectives Simulator
